@@ -1,0 +1,7 @@
+{
+  "name":"study-ai-helper",
+  "version":"1.0.0",
+  "private":true,
+  "description":"AI-powered study helper",
+  "scripts":{"dev":"vercel dev"}
+}
