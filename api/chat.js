@@ -1,38 +1,43 @@
-export default async function handler(req,res){
-  if(req.method!=="POST") return res.status(405).json({error:"Method not allowed"});
-  if(!process.env.OPENAI_API_KEY) return res.status(500).json({error:"OPENAI_API_KEY is not configured on the server."});
-  try{
-    const {question,subject="General",mode="explain",level="Beginner"}=req.body||{};
-    if(!question||typeof question!=="string") return res.status(400).json({error:"Please provide a question."});
-    const modeInstructions={
-      explain:"Explain the topic clearly, using simple language, examples, and a short recap.",
-      steps:"Solve or explain the problem step by step. Show the reasoning in a way a student can learn from.",
-      quiz:"Create 5 practice questions about the topic, then provide an answer key after the questions.",
-      flashcards:"Create 8 useful flashcards. Format each as QUESTION: ... / ANSWER: ...",
-      summary:"Give a concise study summary with the key ideas, important terms, and a short recap."
-    };
-    const prompt=[
-      "You are StudyAI, a friendly educational tutor.",
-      "Subject: "+subject,
-      "Student level: "+level,
-      "Task: "+(modeInstructions[mode]||modeInstructions.explain),
-      "Student question:",
-      question,
-      "Help the student learn rather than simply encouraging them to copy an answer. Be accurate and age-appropriate."
-    ].join("\n\n");
-    const response=await fetch("https://api.openai.com/v1/responses",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+process.env.OPENAI_API_KEY},
-      body:JSON.stringify({model:"gpt-5.6-luna",input:prompt})
+import OpenAI from "openai";
+
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+const modes = {
+  explain: "Erkläre verständlich und mit kurzen Beispielen.",
+  steps: "Löse die Aufgabe Schritt für Schritt und erkläre jeden Schritt.",
+  quiz: "Erstelle ein kurzes Quiz mit 5 Fragen und gib die Lösungen danach getrennt an.",
+  flashcards: "Erstelle 8 kompakte Lernkarten im Format Frage: ... / Antwort: ...."
+};
+
+export default async function handler(req, res) {
+  if (req.method !== "POST") return res.status(405).json({ error: "Nur POST ist erlaubt." });
+  try {
+    const { question, subject="Allgemein", difficulty="Mittel", mode="explain" } = req.body || {};
+    if (typeof question !== "string" || !question.trim()) return res.status(400).json({ error: "Bitte gib eine Frage ein." });
+    if (question.length > 5000) return res.status(400).json({ error: "Die Frage ist zu lang (max. 5000 Zeichen)." });
+    if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: "OPENAI_API_KEY ist beim Hosting noch nicht gesetzt." });
+
+    const instructions = [
+      "Du bist StudyAI, ein geduldiger Lernassistent für Schüler.",
+      "Hilf beim Verstehen, statt nur eine fertige Antwort hinzuschreiben.",
+      "Antworte auf Deutsch, außer eine andere Sprache wird verlangt.",
+      "Passe die Erklärung an die Schwierigkeit an.",
+      "Fach: " + subject,
+      "Schwierigkeit: " + difficulty,
+      "Aufgabenmodus: " + (modes[mode] || modes.explain),
+      "Erfinde keine Quellen oder Fakten."
+    ].join("\n");
+
+    const response = await client.responses.create({
+      model: process.env.OPENAI_MODEL || "gpt-5.6-luna",
+      instructions,
+      input: question,
+      store: false
     });
-    const data=await response.json();
-    if(!response.ok) return res.status(response.status).json({error:data?.error?.message||"AI request failed."});
-    let answer=data.output_text;
-    if(!answer && Array.isArray(data.output)){
-      answer=data.output.flatMap(x=>x.content||[]).map(x=>x.text||"").filter(Boolean).join("\n");
-    }
-    return res.status(200).json({answer:answer||"The AI returned an empty response."});
-  }catch(error){
-    return res.status(500).json({error:"Server error: "+error.message});
+
+    return res.status(200).json({ answer: response.output_text || "Ich konnte keine Antwort erzeugen." });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Die KI konnte gerade nicht antworten. Prüfe den API-Schlüssel und die Hosting-Einstellungen." });
   }
 }
