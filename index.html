@@ -1,90 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>StudyAI Helper</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f4f7fb;color:#172033}
-header{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:38px 20px;text-align:center}
-header h1{margin:0 0 8px;font-size:38px}header p{margin:0;opacity:.9}
-.container{max-width:1000px;margin:28px auto;padding:0 18px}
-.card{background:#fff;border-radius:18px;padding:24px;margin-bottom:20px;box-shadow:0 8px 30px rgba(20,30,60,.08)}
-label{display:block;font-weight:700;margin:0 0 8px}
-textarea{width:100%;min-height:150px;border:1px solid #d7dce7;border-radius:12px;padding:15px;font-size:16px;resize:vertical;outline:none}
-textarea:focus,select:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
-.row{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
-select{flex:1;min-width:180px;padding:12px;border:1px solid #d7dce7;border-radius:10px;background:#fff;font-size:15px}
-button{border:0;border-radius:10px;padding:13px 18px;background:#4f46e5;color:white;font-size:15px;font-weight:700;cursor:pointer}
-button:hover{filter:brightness(.95)}button:disabled{opacity:.6;cursor:wait}
-.answer{display:none;margin-top:22px;padding:20px;border-radius:12px;background:#f8fafc;line-height:1.7;white-space:pre-wrap}
-.status{margin-top:12px;color:#64748b;font-size:14px}
-.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
-.feature{background:#eef2ff;border-radius:14px;padding:18px}
-.feature h3{margin:0 0 7px}
-footer{text-align:center;color:#64748b;padding:25px}
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687386;--line:#e4e8f0;--accent:#635bff;--accent2:#5148e8;--user:#ecebff}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+.app{min-height:100vh;display:grid;grid-template-columns:270px 1fr}.side{background:#111827;color:#fff;padding:22px;display:flex;flex-direction:column;gap:18px}.brand{font-size:21px;font-weight:800}.brand span{color:#9b95ff}.side p{color:#b8c0ce;font-size:13px;line-height:1.5}.controls{display:grid;gap:9px}.controls label{font-size:12px;color:#aeb7c7}.controls select,.controls button{width:100%;border:1px solid #303a4b;background:#1b2433;color:#fff;border-radius:10px;padding:10px}.controls button{cursor:pointer}.tip{margin-top:auto;border:1px solid #303a4b;border-radius:12px;padding:12px;color:#c8d0dc;font-size:12px;line-height:1.5}
+main{min-width:0}.top{height:68px;border-bottom:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 28px}.status{font-size:13px;color:var(--muted)}.status i{display:inline-block;width:8px;height:8px;background:#22c55e;border-radius:50%;margin-right:7px}
+#chat{width:min(900px,100%);margin:auto;padding:34px 22px 145px;display:flex;flex-direction:column;gap:16px}.welcome{text-align:center;padding:55px 10px 20px}.welcome h1{font-size:38px;margin:0 0 10px}.welcome p{color:var(--muted)}.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:20px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 13px;cursor:pointer;color:var(--text)}
+.msg{max-width:82%;border-radius:16px;padding:15px 17px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 10px 30px #17203312}.user{align-self:flex-end;background:var(--user)}.ai{align-self:flex-start;background:#fff;border:1px solid var(--line)}.meta{font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:700}
+.composer{position:fixed;bottom:0;left:270px;right:0;padding:18px 22px;background:linear-gradient(transparent,var(--bg) 30%)}form{width:min(900px,100%);margin:auto;background:#fff;border:1px solid var(--line);border-radius:18px;padding:9px;display:flex;gap:8px;align-items:flex-end;box-shadow:0 10px 30px #17203312}textarea{flex:1;border:0;outline:0;resize:none;font:inherit;padding:10px;min-height:46px;max-height:150px;background:transparent;color:var(--text)}.send{border:0;background:var(--accent);color:#fff;border-radius:12px;padding:11px 17px;font-weight:700;cursor:pointer}.send:disabled{opacity:.5}
+.loading{display:flex;gap:5px}.dot{width:7px;height:7px;border-radius:50%;background:#8b93a5;animation:b 1s infinite}.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}@keyframes b{50%{opacity:.25;transform:translateY(-3px)}}
+@media(max-width:760px){.app{grid-template-columns:1fr}.side{display:none}.composer{left:0}.top{padding:0 16px}.welcome h1{font-size:30px}.msg{max-width:92%}}
 </style>
 </head>
 <body>
-<header><h1>📚 StudyAI Helper</h1><p>Your AI-powered study assistant</p></header>
-<main class="container">
-<section class="card">
-<label for="question">What do you want to learn?</label>
-<textarea id="question" placeholder="Example: Explain photosynthesis in simple terms..."></textarea>
-<div class="row">
-<select id="subject">
-<option>General</option><option>Math</option><option>Science</option><option>History</option><option>English</option><option>Computer Science</option>
-</select>
-<select id="mode">
-<option value="explain">Explain it</option>
-<option value="steps">Step-by-step solution</option>
-<option value="quiz">Make a quiz</option>
-<option value="flashcards">Make flashcards</option>
-<option value="summary">Summarize it</option>
-</select>
-<select id="level">
-<option>Beginner</option><option>Intermediate</option><option>Advanced</option>
-</select>
+<div class="app">
+<aside class="side"><div class="brand">Study<span>AI</span> Helper</div><p>Dein Lernassistent für Erklärungen, Schritt-für-Schritt-Hilfe, Quizfragen und Lernkarten.</p>
+<div class="controls">
+<label>Fach</label><select id="subject"><option>Allgemein</option><option>Mathematik</option><option>Deutsch</option><option>Englisch</option><option>Biologie</option><option>Physik</option><option>Chemie</option><option>Geschichte</option><option>Informatik</option></select>
+<label>Schwierigkeit</label><select id="difficulty"><option>Anfänger</option><option selected>Mittel</option><option>Fortgeschritten</option></select>
+<label>Modus</label><select id="mode"><option value="explain">Erklären</option><option value="steps">Schritt für Schritt</option><option value="quiz">Quiz</option><option value="flashcards">Lernkarten</option></select>
+<button id="clear">Chat löschen</button></div>
+<div class="tip"><b>Tipp:</b> Schreibe die konkrete Aufgabe und sag, was du schon versucht hast. So kann StudyAI besser erklären.</div></aside>
+<main><header class="top"><strong>StudyAI</strong><div class="status"><i></i>Bereit</div></header><section id="chat"><div class="welcome" id="welcome"><h1>Was möchtest du lernen?</h1><p>Stell eine Aufgabe oder bitte um eine Erklärung.</p><div class="chips"><button class="chip" data-q="Erkläre mir Brüche ganz einfach.">Brüche</button><button class="chip" data-q="Wie löse ich eine lineare Gleichung?">Gleichungen</button><button class="chip" data-q="Mach mir ein kurzes Biologie-Quiz über die Zelle.">Biologie-Quiz</button><button class="chip" data-q="Erstelle Lernkarten zum Thema Französische Revolution.">Lernkarten</button></div></div></section></main>
 </div>
-<div class="row">
-<button id="askBtn" onclick="askAI()">✨ Ask StudyAI</button>
-<button onclick="document.getElementById('question').value='';document.getElementById('answer').style.display='none';">Clear</button>
-</div>
-<div id="status" class="status"></div>
-<div id="answer" class="answer"></div>
-</section>
-<section class="card">
-<h2>Study tools</h2>
-<div class="features">
-<div class="feature"><h3>🧠 Explanations</h3><p>Understand difficult topics in language matched to your level.</p></div>
-<div class="feature"><h3>📝 Quizzes</h3><p>Generate practice questions and test yourself.</p></div>
-<div class="feature"><h3>🎴 Flashcards</h3><p>Turn a topic into quick revision cards.</p></div>
-<div class="feature"><h3>🔢 Step-by-step</h3><p>Work through problems with clear reasoning.</p></div>
-</div>
-</section>
-</main>
-<footer>StudyAI Helper • Built with HTML, CSS, JavaScript and an AI API</footer>
+<div class="composer"><form id="form"><textarea id="input" rows="1" placeholder="Stell deine Lernfrage …"></textarea><button class="send" id="send">Senden</button></form></div>
 <script>
-async function askAI(){
- const question=document.getElementById("question").value.trim();
- if(!question){alert("Please enter a question first.");return}
- const btn=document.getElementById("askBtn"), status=document.getElementById("status"), answer=document.getElementById("answer");
- btn.disabled=true; status.textContent="StudyAI is thinking..."; answer.style.display="none";
- try{
-   const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-     question,subject:document.getElementById("subject").value,mode:document.getElementById("mode").value,level:document.getElementById("level").value
-   })});
-   const data=await res.json();
-   if(!res.ok) throw new Error(data.error||"Something went wrong.");
-   answer.textContent=data.answer;
-   answer.style.display="block";
-   status.textContent="Done.";
- }catch(err){
-   status.textContent="Error";
-   answer.textContent=err.message;
-   answer.style.display="block";
- }finally{btn.disabled=false}
-}
+const chat=document.getElementById("chat"),input=document.getElementById("input"),form=document.getElementById("form"),send=document.getElementById("send"),subject=document.getElementById("subject"),difficulty=document.getElementById("difficulty"),mode=document.getElementById("mode");
+function msg(text,who){document.getElementById("welcome")?.remove();const e=document.createElement("div");e.className="msg "+who;const m=document.createElement("div");m.className="meta";m.textContent=who==="user"?"Du":"StudyAI";e.append(m,document.createTextNode(text));chat.appendChild(e);window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});return e}
+function loading(){document.getElementById("welcome")?.remove();const e=document.createElement("div");e.className="msg ai loading";e.innerHTML="<span class=dot></span><span class=dot></span><span class=dot></span>";chat.appendChild(e);return e}
+async function ask(q){q=q.trim();if(!q||send.disabled)return;msg(q,"user");input.value="";input.style.height="auto";send.disabled=true;const l=loading();try{const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,subject:subject.value,difficulty:difficulty.value,mode:mode.value})});const d=await r.json();l.remove();if(!r.ok)throw Error(d.error||"Unbekannter Fehler");msg(d.answer,"ai")}catch(e){l.remove();msg("Fehler: "+e.message,"ai")}finally{send.disabled=false;input.focus()}}
+form.addEventListener("submit",e=>{e.preventDefault();ask(input.value)});input.addEventListener("input",()=>{input.style.height="auto";input.style.height=Math.min(input.scrollHeight,150)+"px"});input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
+document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{input.value=b.dataset.q;form.requestSubmit()});
+document.getElementById("clear").onclick=()=>{chat.innerHTML='<div class="welcome" id="welcome"><h1>Was möchtest du lernen?</h1><p>Stell eine Aufgabe oder bitte um eine Erklärung.</p></div>'};
 </script>
-</body>
-</html>
+</body></html>
