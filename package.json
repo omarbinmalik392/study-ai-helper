@@ -1,6 +1,9 @@
 {
-  "name":"study-ai-helper",
-  "version":"1.0.0",
-  "private":true,
-  "dependencies":{"openai":"latest"}
+  "name": "study-ai-helper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "openai": "latest"
+  }
 }
